@@ -1,5 +1,7 @@
 # NetDevelopment
-CSDN网络编程基础专栏第一篇博文代码
-一个简单的socket服务器端代码
-                By Hyman
-                2016/11/11
+# 提交socket客户端代码
+# 开启服务端:./serv 9190
+# 用客户端链接:./clnt 127.0.0.1 9190
+#               
+#                By Hyman
+#                2016/11/12
