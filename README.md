@@ -1,7 +1,5 @@
-# NetDevelopment
-# 提交socket客户端代码
-# 开启服务端:./serv 9190
-# 用客户端链接:./clnt 127.0.0.1 9190
-#               
-#                By Hyman
-#                2016/11/12
+#NetDevelopment
+<p style="font-weight:bold;">Author: Hyman</p>
+<p style="font-weight:bold;">Date: 2016/11/14</p>
+<p>windows版的socket服务端代码</p>
+<p>开启服务端:serv 9190</p>
