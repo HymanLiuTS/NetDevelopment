@@ -1,76 +1,80 @@
 //////////////////////////////////////////////////////////////////////////
 //////File: getsetopt.c
-//////Description: 网络编程（9）—— 怎么获取和设置socket的输出\输入缓冲等多种可选项源代码
+//////Description: 网络编程（10）——  通过设置可选项取消socket的TImeWait状态以及开启Nagle算法
 //////Author: Hyman
-//////Date: 2016/11/18
+//////Date: 2016/11/19
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include<unistd.h>
+#include<arpa/inet.h>
 #include<sys/socket.h>
-
+#include<linux/tcp.h>
+#define TRUE 1
+#define FLASE 0
 void error_handling(char* message);
 
-int main(int argc,char* argv)
+int main(int argc,char* argv[])
 {
-    //声明socket
-    int tcp_sock,udp_sock;
-    //socket类型
-    int sock_type;
-    //socket缓冲区大小
-    int snd_buf,rev_buf;
-    //可选项字节数
-    socklen_t optlen;
-    //getsockopt返回的状态，0表示获取成功
-    int state;
+    int serv_sock,clnt_sock;
+    char message[30];
+    struct sockaddr_in serv_addr,clnt_addr;
+    int clntAdrLen,strLen,optlen,option;
+    if(argc!=2)
+    {
+        printf("Usage %s <port>\n",argv[0]);
+        exit(1);
+    }
     
-    optlen=sizeof(sock_type);
-    tcp_sock=socket(PF_INET,SOCK_STREAM,0);
-    udp_sock=socket(PF_INET,SOCK_DGRAM,0);
-    printf("SOCK_STREAM: %d\n",SOCK_STREAM);
-    printf("SOCK_DGRAM: %d\n",SOCK_DGRAM);
+    //创建socket
+    serv_sock=socket(AF_INET,SOCK_STREAM,0);
+    if(serv_sock==-1)
+            error_handling("socket error");
+    
+    //设置Time_Wait状态下套接字可重新分配
+    optlen=sizeof(option);
+    option=TRUE;
+    setsockopt(serv_sock,SOL_SOCKET,SO_REUSEADDR,(void*)&option,optlen);
 
-    state=getsockopt(tcp_sock,SOL_SOCKET,SO_TYPE,&sock_type,&optlen);
-    if(state)
-        error_handling("getsockopt one error");
-    printf("socket type one: %d\n",sock_type);
+    //设置Nagle算法禁用
+    optlen=sizeof(option);
+    optlen=TRUE;
+    setsockopt(serv_sock,IPPROTO_TCP,TCP_NODELAY,(void*)&option,optlen);
 
-    state=getsockopt(udp_sock,SOL_SOCKET,SO_TYPE,&sock_type,&optlen);
-    if(state)
-        error_handling("getsockopt two error");
-    printf("socket type two: %d\n",sock_type);
+    //准备通信地址
+    memset(&serv_addr,0,sizeof(serv_addr));
+    serv_addr.sin_family=AF_INET;
+    serv_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+    serv_addr.sin_port=htons(atoi(argv[1]));
 
-    optlen=sizeof(snd_buf);
-    state=getsockopt(tcp_sock,SOL_SOCKET,SO_SNDBUF,&snd_buf,&optlen);
-    if(state==0)
-        printf("socket输出缓冲区大小是: %d\n",snd_buf);
-    optlen=sizeof(rev_buf);
-    state=getsockopt(tcp_sock,SOL_SOCKET,SO_RCVBUF,&rev_buf,&optlen);
-    if(state==0)
-        printf("socket输入缓冲区大小是: %d\n",rev_buf);
-
-    printf("更改输入和输出缓冲区...\n");
-
-    snd_buf=1024*3;
-    rev_buf=1024*6;
-
-    optlen=sizeof(snd_buf);
-    state=setsockopt(tcp_sock,SOL_SOCKET,SO_SNDBUF,&snd_buf,optlen);
-    if(state==0)
+    //socket和通信地址的bind
+    if(bind(serv_sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr))!=0)
+        error_handling("bind error");
+    
+    //监听
+    if(listen(serv_sock,5)==-1)
+            error_handling("listen error");
+    
+    //接收连接
+    clntAdrLen=sizeof(clnt_addr);
+    clnt_sock=accept(serv_sock,(struct sockaddr*)&clnt_addr,&clntAdrLen);
+    
+    //读取数据
+    while((strLen=read(clnt_sock,message,sizeof(message)))!=0)
     {
-        state=getsockopt(tcp_sock,SOL_SOCKET,SO_SNDBUF,&snd_buf,&optlen);
-        printf("更改成功!\n");
-        printf("更改后的输出缓冲区大小为:%d\n",snd_buf);
+        printf("sizeof(message) = %d\n",sizeof(message));
+        printf("接收到的数据是:%s 数据长度:%d\n",message,strLen);
+        write(clnt_sock,message,strLen);
+        //write(1,message,strLen);
+        fputs("回送成功。",stdout);
+        fputc('\n',stdout);
     }
-    optlen=sizeof(rev_buf);
-    state=setsockopt(tcp_sock,SOL_SOCKET,SO_RCVBUF,&rev_buf,optlen);
-    if(state==0)
-    {
-        state=getsockopt(tcp_sock,SOL_SOCKET,SO_RCVBUF,&rev_buf,&optlen);
-        printf("更改后的输入缓冲区大小为:%d\n",rev_buf);
-    }
+    
+    close(clnt_sock);
+    close(serv_sock);
     return 0;
 }
 
