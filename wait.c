@@ -8,27 +8,25 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
-int gval=10;
+#include<sys/wait.h>
+
 int main()
 {
-    int ival=100;
-    int pid=fork();
-    if(pid==0)//子进程
-    {
-        ival++;
-    }
-    else//父进程
-    {
-        gval++;
-    }
+    int status;
+    pid_t pid=fork();
     if(pid==0)
     {
-        printf("child process: gval=%d,ival=%d\n",gval,ival);
+        sleep(20);
+        return 3;
     }
     else
     {
-        printf("parent process: gval=%d,ival=%d\n",gval,ival);
+        printf("当前子进程ID:%d\n",pid);
+        wait(&status);
+        if(WIFEXITED(status))
+                printf("子进程返回值:%d\n",WEXITSTATUS(status));
     }
     return 0;
 }
+
 
