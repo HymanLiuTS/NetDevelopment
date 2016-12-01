@@ -1,10 +1,14 @@
 #include<stdio.h>  
-#include<string.h>  
+#inlude<string.h>  
 #include<stdlib.h>  
 #include<sys/socket.h>  
 #include<arpa/inet.h>  
+#include<time.h>  
 #define BUF_SIZE 100   
+  
+void print_time();  
 void error_handling(char* message);  
+  
 int main(int argc,char* argv[])  
 {  
     int serv_sock,clnt_sock;  
@@ -12,6 +16,7 @@ int main(int argc,char* argv[])
     int clnt_addr_sz;  
     int str_len,i,j;  
     char buf[BUF_SIZE];  
+  
     if(argc!=2)  
     {  
         printf("Usage %s <port>\n",argv[0]);  
@@ -21,17 +26,23 @@ int main(int argc,char* argv[])
     serv_sock=socket(AF_INET,SOCK_STREAM,0);  
     if(serv_sock==-1)  
         error_handling("socket error");  
+  
     //填充地址信息  
     memset(&serv_addr,0,sizeof(serv_addr));  
     serv_addr.sin_family=AF_INET;  
     serv_addr.sin_addr.s_addr=htonl(INADDR_ANY);  
     serv_addr.sin_port=htons(atoi(argv[1]));  
+  
     //socket和ip地址的绑定  
     if(bind(serv_sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr))==-1)  
         error_handling("bind error");  
+  
     //开启监听  
     if(listen(serv_sock,5)==-1)  
         error_handling(" listen error");  
+        sleep(10);  
+    fputs("end sleep:",stdout);  
+    print_time();  
     for(i=0;i<5;i++)  
     {  
         clnt_addr_sz=sizeof(clnt_addr);  
@@ -44,17 +55,32 @@ int main(int argc,char* argv[])
         while(1)  
         {  
             str_len=read(clnt_sock,buf,BUF_SIZE);  
-            for(j=0;j<3;j++)  
-            {  
-                write(clnt_sock,buf,str_len-1);  
-            }  
+                write(clnt_sock,buf,str_len);  
             memset(buf,0,sizeof(buf));  
+            if(str_len<=0)  
+                break;  
         }  
         close(clnt_sock);  
     }  
     close(serv_sock);  
     return 0;  
 }  
+void print_time()  
+{  
+    time_t now=time(0);  
+    struct tm* ptm=localtime(&now);  
+    char buf[256]={0};  
+    sprintf(buf,"time now:[%02d-%02d-%02d %02d:%02d:%02d]",  
+            ptm->tm_year+1900,  
+            ptm->tm_mon+1,  
+            ptm->tm_mday,  
+            ptm->tm_hour,  
+            ptm->tm_min,  
+            ptm->tm_sec);  
+    puts(buf);  
+}  
+  
+  
   
 void error_handling(char* message)  
 {  
