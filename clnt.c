@@ -4,9 +4,10 @@
 #include<sys/socket.h>  
 #include<arpa/inet.h>  
 #include<time.h>  
-#define BUF_SIZE 100  
+#define BUF_SIZE 10000000  
   
 void print_time();  
+  
 void error_handling(const char* message);  
   
 int main(int argc,char* argv[])  
@@ -20,6 +21,7 @@ int main(int argc,char* argv[])
     sock=socket(AF_INET,SOCK_STREAM,0);  
     if(sock==-1)  
         error_handling("socket error");  
+  
     //准备地址  
     memset(&serv_addr,0,sizeof(serv_addr));  
     serv_addr.sin_family=AF_INET;  
@@ -31,7 +33,6 @@ int main(int argc,char* argv[])
         error_handling("connect error");  
     else  
             puts("connect succeed");  
-    print_time();  
     while(1)  
     {  
         memset(buf,0,BUF_SIZE);  
@@ -39,13 +40,15 @@ int main(int argc,char* argv[])
         fgets(buf,BUF_SIZE,stdin);  
         if(!strcmp(buf,"q\n")||!strcmp(buf,"Q/n"))  
             break;  
-        print_time();  
+  
         str_len=write(sock,buf,strlen(buf));  
-        puts("writed");  
+        puts("writed,begin block");  
         print_time();  
         sizeof(buf,0,sizeof(buf));  
         while(recv_len<str_len)  
             recv_len+=read(sock,buf,BUF_SIZE-1);  
+        puts("end block");  
+        print_time();  
         buf[str_len]=0;  
         printf("服务器传回信息:%s\n",buf);  
     }  
@@ -53,14 +56,13 @@ int main(int argc,char* argv[])
     return 0;  
 }  
   
-  
 void print_time()  
 {  
-    time_t now=time(0);  
+  time_t now=time(0);  
     struct tm* ptm=localtime(&now);  
     char buf[256]={0};  
     sprintf(buf,"time now:[%02d-%02d-%02d %02d:%02d:%02d]",  
-            ptm->tm_year+1900,  
+        ptm->tm_year+1900,  
             ptm->tm_mon+1,  
             ptm->tm_mday,  
             ptm->tm_hour,  
@@ -69,11 +71,11 @@ void print_time()
     puts(buf);  
 }  
   
-  
 void error_handling(const char* message)  
 {  
     fputs(message,stderr);  
     fputc('\n',stderr);  
     exit(1);  
-}     
+}  
+
 
