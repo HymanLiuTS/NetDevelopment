@@ -1,71 +1,92 @@
 #include<stdio.h>  
-#include<string.h>  
 #include<stdlib.h>  
+#include<unistd.h>  
 #include<sys/socket.h>  
 #include<arpa/inet.h>  
-  
-#define BUF_SIZE 100   
-  
+#include<signal.h>  
+#include<string.h>  
+#define BUF_SIZE 1024  
+   
 void error_handling(char* message);  
-  
+void read_handling(int sock);  
+void write_handling(int sock);  
+   
 int main(int argc,char* argv[])  
-  
 {  
-    int serv_sock,clnt_sock;  
-    struct sockaddr_in serv_addr,clnt_addr;  
-    int clnt_addr_sz;  
-    int str_len,i,j;  
-    char buf[BUF_SIZE];  
-  
-    if(argc!=2)  
+    int sock;  
+    struct sockaddr_in addr;  
+    pid_t pid;  
+   
+    if(argc!=3)  
     {  
-        printf("Usage %s <port>\n",argv[0]);  
+        printf("Usage %s<address> <port>\n",argv[0]);  
         exit(1);  
     }  
-    //创建socket  
-    serv_sock=socket(AF_INET,SOCK_STREAM,0);  
-    if(serv_sock==-1)  
-        error_handling("socket error");  
-    //填充地址信息  
-    memset(&serv_addr,0,sizeof(serv_addr));  
-    serv_addr.sin_family=AF_INET;  
-    serv_addr.sin_addr.s_addr=htonl(INADDR_ANY);  
-    serv_addr.sin_port=htons(atoi(argv[1]));  
-    //socket和ip地址的绑定  
-    if(bind(serv_sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr))==-1)  
-        error_handling("bind error");  
-    //开启监听  
-    if(listen(serv_sock,5)==-1)  
-        error_handling(" listen error");  
-        sleep(10);  
-    for(i=0;i<5;i++)  
+   
+   sock=socket(AF_INET,SOCK_STREAM,0);  
+    if(sock==-1)  
+       error_handling("socket() error");  
+   
+   memset(&addr,0,sizeof(addr));  
+    addr.sin_family=AF_INET;  
+   addr.sin_addr.s_addr=inet_addr(argv[1]);  
+   addr.sin_port=htons(atoi(argv[2]));  
+     
+    if(connect(sock,(structsockaddr*)&addr,sizeof(addr))==-1)  
+       error_handling("connect() error");  
+   
+    pid=fork();  
+    if(pid==0)  
     {  
-        clnt_addr_sz=sizeof(clnt_addr);  
-        clnt_sock=accept(serv_sock,(struct sockaddr*)&clnt_addr,&clnt_addr_sz);  
-        if(clnt_sock==-1)  
-            error_handling("accept error");  
-        else  
-            printf("clnt:%s connected\n",inet_ntoa(clnt_addr.sin_addr));  
-        //接受数据  
-        while(1)  
-        {  
-            str_len=read(clnt_sock,buf,BUF_SIZE);  
-                write(clnt_sock,buf,str_len);  
-            memset(buf,0,sizeof(buf));  
-            if(str_len<=0)  
-                break;  
-        }  
-        close(clnt_sock);  
+        write_handling(sock);  
     }  
-    close(serv_sock);  
+    else  
+    {  
+        read_handling(sock);  
+    }  
+    close(sock);  
     return 0;  
 }  
-  
-  
+   
+//写进程  
+void write_handling(int sock)  
+{  
+    char buf[BUF_SIZE];  
+    while(1)  
+    {    
+       memset(buf,0,BUF_SIZE);  
+        fputs("Input:",stdout);  
+       fgets(buf,BUF_SIZE,stdin);  
+       if(!strcmp(buf,"q\n")||  
+          !strcmp(buf,"Q\n"))  
+        {  
+            //shutdown(sock,SHUT_WR);  
+            return;  
+        }  
+        write(sock,buf,strlen(buf));  
+    }  
+}  
+   
+//读进程  
+void read_handling(int sock)  
+{  
+    int str_len;  
+    char buf[BUF_SIZE];  
+    while(1)  
+    {  
+       str_len=read(sock,buf,BUF_SIZE);  
+        if(str_len<=0)  
+            return;  
+        buf[str_len]=0;  
+        printf("themessage from server:%s\n",buf);  
+    }  
+}  
+   
+   
 void error_handling(char* message)  
 {  
     fputs(message,stderr);  
     fputc('\n',stderr);  
     exit(1);  
-}  
+}       
 
