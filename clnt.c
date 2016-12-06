@@ -3,79 +3,33 @@
 #include<string.h>  
 #include<sys/socket.h>  
 #include<arpa/inet.h>  
-#include<time.h>  
-#define BUF_SIZE 10000000  
-  
-void print_time();  
-  
-void error_handling(const char* message);  
-  
-int main(int argc,char* argv[])  
-{  
-    int sock;  
-    struct sockaddr_in serv_addr;  
-    int str_len;  
-    char buf[BUF_SIZE];  
-    int recv_len=0;  
-    //创建socket  
-    sock=socket(AF_INET,SOCK_STREAM,0);  
-    if(sock==-1)  
-        error_handling("socket error");  
-  
-    //准备地址  
-    memset(&serv_addr,0,sizeof(serv_addr));  
-    serv_addr.sin_family=AF_INET;  
-    serv_addr.sin_addr.s_addr=inet_addr(argv[1]);  
-    serv_addr.sin_port=htons(atoi(argv[2]));  
-  
-    //链接  
-    if(connect(sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr))==-1)  
-        error_handling("connect error");  
-    else  
-            puts("connect succeed");  
-    while(1)  
-    {  
-        memset(buf,0,BUF_SIZE);  
-        fputs("请输入数据:",stdout);  
-        fgets(buf,BUF_SIZE,stdin);  
-        if(!strcmp(buf,"q\n")||!strcmp(buf,"Q/n"))  
-            break;  
-  
-        str_len=write(sock,buf,strlen(buf));  
-        puts("writed,begin block");  
-        print_time();  
-        sizeof(buf,0,sizeof(buf));  
-        while(recv_len<str_len)  
-            recv_len+=read(sock,buf,BUF_SIZE-1);  
-        puts("end block");  
-        print_time();  
-        buf[str_len]=0;  
-        printf("服务器传回信息:%s\n",buf);  
-    }  
-    close(sock);  
-    return 0;  
-}  
-  
-void print_time()  
-{  
-  time_t now=time(0);  
-    struct tm* ptm=localtime(&now);  
-    char buf[256]={0};  
-    sprintf(buf,"time now:[%02d-%02d-%02d %02d:%02d:%02d]",  
-        ptm->tm_year+1900,  
-            ptm->tm_mon+1,  
-            ptm->tm_mday,  
-            ptm->tm_hour,  
-            ptm->tm_min,  
-            ptm->tm_sec);  
-    puts(buf);  
-}  
-  
-void error_handling(const char* message)  
-{  
-    fputs(message,stderr);  
-    fputc('\n',stderr);  
-    exit(1);  
-}  
 
+  
+int main(int argc,char* argv[])
+{
+	pid_t pid;
+	int sout,result;
+	int sock;
+	struct sockaddr_in addr;
+	char buf[1024];
+	sock=socket(AF_INET,SOCK_STREAM,0);
+	memset(&addr,0,sizeof(addr));
+	addr.sin_family=AF_INET;
+	addr.sin_addr.s_addr=inet_addr(argv[1]);
+	addr.sin_port=htons(atoi(argv[2]));
+	connect(sock,(struct sockaddr*)&addr,sizeof(addr));
+	pid=fork();
+	if(pid==0)
+	{
+		close(sock);
+	}
+	else
+	{
+		sleep(2);
+		write(sock,"hello world\n",12);
+		read(sock,buf,1024);
+		fputs(buf,stdout);
+	}
+	return 0;
+}
 
