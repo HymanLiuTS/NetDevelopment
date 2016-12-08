@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mfctest", "Mfctest\Mfctest.vcxproj", "{21C0A449-BA4F-47A5-8198-7DB3FABD8267}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mfctest2", "mfctest2\mfctest2.vcxproj", "{927578C2-9148-425E-8C43-6A0324391E4A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21C0A449-BA4F-47A5-8198-7DB3FABD8267}.Debug|Win32.ActiveCfg = Debug|Win32
+		{21C0A449-BA4F-47A5-8198-7DB3FABD8267}.Debug|Win32.Build.0 = Debug|Win32
+		{21C0A449-BA4F-47A5-8198-7DB3FABD8267}.Release|Win32.ActiveCfg = Release|Win32
+		{21C0A449-BA4F-47A5-8198-7DB3FABD8267}.Release|Win32.Build.0 = Release|Win32
+		{927578C2-9148-425E-8C43-6A0324391E4A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{927578C2-9148-425E-8C43-6A0324391E4A}.Debug|Win32.Build.0 = Debug|Win32
+		{927578C2-9148-425E-8C43-6A0324391E4A}.Release|Win32.ActiveCfg = Release|Win32
+		{927578C2-9148-425E-8C43-6A0324391E4A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
