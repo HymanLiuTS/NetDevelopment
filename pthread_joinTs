@@ -1,0 +1,26 @@
+#include<stdio.h>
+#include<pthread.h>
+
+void* thread_main(void* pmax)
+{
+    int i;
+    int max=*((int*)pmax);
+    for(i=0;i<max;i++)
+    {
+        puts("child thread called...");
+        sleep(1);
+    }
+    return "Tread ended ...";
+}
+
+int main()
+{
+    pthread_t pid;
+    void* rst;
+    int max=10;
+    pthread_create(&pid,NULL,(void*)thread_main,(void*)&max);
+    pthread_join(pid,(void*)&rst);
+    printf("the child return: %s\n",(char*)rst);
+    return 0;
+}
+
