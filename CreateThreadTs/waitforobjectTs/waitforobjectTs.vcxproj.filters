@@ -29,7 +29,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="_beginthreadexTs.cpp">
+    <ClCompile Include="waitforobjectTs.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
