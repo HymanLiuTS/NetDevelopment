@@ -16,44 +16,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="res\WSAAsyncSelectServ.rc2">
-      <Filter>资源文件</Filter>
-    </None>
-    <None Include="res\WSAAsyncSelectServ.ico">
-      <Filter>资源文件</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="WSAAsyncSelectServ.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WSAAsyncSelectServDlg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="WSAAsyncSelectServ.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WSAAsyncSelectServDlg.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="WSAAsyncSelectServ.rc">
-      <Filter>资源文件</Filter>
-    </ResourceCompile>
+    <ClCompile Include="WSASocketServ.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
