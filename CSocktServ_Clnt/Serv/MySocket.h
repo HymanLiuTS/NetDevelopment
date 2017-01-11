@@ -4,14 +4,12 @@
 
 #define ACCEPT 0
 #define RECIEVE 1
-#define CONNECT 2
-#define SEND 3
-#define CLOSE 4
+#define CLOSE 2
 
 #define BUF_SIZE 1024
 // CMySocket ÃüÁîÄ¿±ê
 
-class CMySocket : public CAsyncSocket
+class CMySocket : public CSocket
 {
 public:
 	CMySocket();
